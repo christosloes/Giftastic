@@ -1,0 +1,210 @@
+<!-- Before getting started I just want to go over a few of the steps that i'm going to follow to complete this assignment
+	////////////////////////////////////////
+
+	STEP ONE:
+
+		Construct the HTML page to display the GIFS including forms, buttons, data-search tags and empty divs to display gifs
+
+	STEP TWO:
+
+		Using ajax, call the url and api key and console.log the results 
+
+	STEP THREE:
+
+		Link buttons to onclick events that pull info from the API and display it on the page
+
+	STEP FOUR:
+
+		Prevent forms from refilling 
+
+	STEP FIVE:
+
+		Make sure that gifs animate only when clicked.
+
+All of the code needed for the steps above can be found in the examples from this past week. Extra care should be taken when establishing the code about developing buttons for the new gifs created as there are many moving parts throughout. 
+
+	 -->
+
+
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<title>Giftastic</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body>
+
+	<div id="animalButtons">
+	</div>
+
+	<form id="animal-form">
+		<label for="animal-input">Add an animal!</label><br>
+		<input type="text" id="animal-input"><br>
+		<input id="addAnimal" type="submit" value="Add an Animal">
+	</form>
+
+	<div id="animals"></div>
+	<script
+  src="https://code.jquery.com/jquery-3.1.1.js"
+  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+  crossorigin="anonymous"></script>
+  <script>
+	/*		q - search query term or phrase
+		limit - (optional) number of results to return, maximum 100. Default 25.
+		offset - (optional) results offset, defaults to 0.
+		rating - (optional) limit results to those rated (y,g, pg, pg-13 or r).
+		lang - (optional) specify default country for regional content; format is 2-letter ISO 639-1 country code. See list of supported languages here
+		fmt - (optional) return results in html or json format (useful for viewing responses as GIFs to debug/test) */
+
+
+
+
+//setting up global variables: 
+	//var topics = ["animals","cars","planes","boats","trees","dogs","cats"]
+	
+	var limitNumber = 10;
+	var rating = [];
+	var animals = ["dog","cat","bird","cow", "sheep",];
+ 	//var animal = '';
+ 	//var animal-input = "cow";
+ 	//var APIkey = dc6zaTOxFJmzC
+
+ 	//displayAnimalInfo function re-renders the HTML to display the appropriate content 
+ 	function displayAnimalInfo() {
+ 		//var animal = event.target.attribute[1].value;
+
+ 		$("#animals").empty();
+ 		var animal = $(this).attr("data-name");
+ 		var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + animals + "&limit=" + limitNumber + "&" + rating + "api_key=dc6zaTOxFJmzC";
+ 	
+ 	//Need to create an AJAX call for the specific gif button that I click
+
+ 	$.ajax({
+ 		url: queryURL,
+ 		method:"GET"
+ 	}).done(function(response) {
+ 		var results = response.data;
+ 		console.log(queryURL);
+ 		console.log(response);
+ 		console.log(results);
+
+
+ 		//I'm creating a new empty div here to store info from the animal button
+
+ 		var animalDiv = $("<div class='animal'>");
+ 		console.log(animalDiv);
+
+ 		//storing the rating data 
+ 		var rating = response.data;
+
+ 		//Creating a new element to have the rating displayed along with the gif
+ 		var pOne = $("<p>").text("Rating: " + rating);
+
+ 		//append the info from the response on to the newly  created empty div
+ 		animalDiv.append(pOne);
+ 	});
+ }
+
+ 	
+
+ 	//Generic function for capturing the topic name 
+ 	//from the data-attribute
+ 	function alertTopicName() {
+ 		var topicName = $(this).attr("data-name");
+ 		console.log(topicName);
+ 	}
+ 	//creating buttons by first emptying out any previous buttons
+ 	//and then looping through the array
+ 	function renderButtons() {
+ 		//$("#animalButtons").empty();
+ 		//looping through the array of animals
+
+ 		for (var i = 0; i < animals.length; i++)
+ 		{
+ 			// Then dynamicaly generating buttons for each movie in the array
+          // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
+
+
+ 			var a = $("<button>");
+ 			//adding a class
+ 			a.addClass("animal");
+ 			//adding a data-attribute with a value of the animals
+ 			//array at index i
+ 			a.attr("data-name", animals[i]);
+ 			//incorporating text in to the newly created buttons
+ 			a.text(animals[i]);
+ 			//adding the button and text in to the HMTL
+ 			$("#animalButtons").append(a);
+ 		}
+
+	}
+
+
+
+ 	//When the user clicks on a button, the page should grab 10 static, non-animated gif images from the GIPHY API and place them on the page.	
+
+ 	//this function will handle events when a button is clicked.
+ 	$("#addAnimal").on("click", function(event) {
+ 		//Preventing the buttons default behavior when clicked ( which is submitting a form)
+ 		event.preventDefault();
+ 		//This line grabs the input from the textbox
+ 		var topic = $("#animal-input").val().trim();
+ 		//adding the topic from the textbox to our array
+ 		animals.push(topic);
+ 		//After wrapping up the code above, we need to call the function renderButtons that handls the processing of our topics array
+
+
+ 	});
+
+ 		$("#animalButtons").on('click',".animal", function() {
+
+ 	$.ajax({
+ 		url: queryURL,
+ 		method:"GET"
+ 	}).done(function(response) {
+ 		var results = response.data;
+ 		console.log(queryURL);
+ 		console.log(response);
+ 		console.log(results);
+
+ 	});
+
+ })
+
+ 	//function for changing the GIF state from still to animated
+
+ 	function onClick() {
+ 		state = $(this).attr('data-state');
+ 		console.log(state);
+
+ 		if (state === 'still') {
+ 			var animateURL = $(this).attr('data-animate');
+ 			console.log(animateURL);
+ 			$(this).attr('src',animateURL);
+ 			$(this).attr('data-state','animate');
+		} else {
+			var stillURL = $(this).attr('data-still');
+			console.log(stillURL);
+			$(this).attr('src',stillURL);
+			$(this).attr('data-state', 'still')
+
+		};
+	};
+
+ 	
+
+ 	// $(document).on('click','button',displayAnimalInfo);
+
+ 	renderButtons();
+		
+
+
+
+
+	</script>
+
+
+</body>
+</html>
